@@ -10,61 +10,62 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
 
-df=pd.read_csv('time_series_covid19_confirmed_global.csv',parse_dates=True)
+df=pd.read_csv('state_by_state_data.csv',parse_dates=True)
+df=df[df['Country/Region']=='US']
 colors='#e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9'.split(', ')
 
 def create_selection_box():
-    countries=df['Country/Region'].unique().tolist()
+    states=df['Province/State'].unique().tolist()
     peaks=[]
-    for c in countries:
+    for s in states:
         try:
-            tmp=df[df['Country/Region']==c].sum().drop(['Country/Region','Lat','Long','Province/State']).max()
+            tmp=df[df['Province/State']==s].sum().drop(['Country/Region','Lat','Long','Province/State']).max()
         except:
             try:
-                tmp=df[df['Country/Region']==c].sum().drop(['Lat','Long']).max()
+                tmp=df[df['Province/State']==c].sum().drop(['Lat','Long']).max()
             except:
                 tmp=0
         peaks.append(tmp)
-    tmp_zip=sorted(list(zip(peaks,countries)),reverse=True)
-    countries=[t[1] for t in tmp_zip]
+    tmp_zip=sorted(list(zip(peaks,states)),reverse=True)
+    states=[t[1] for t in tmp_zip]
     #countries.sort()
-    countries=['All']+countries
+    states=['All']+states
     style = {'description_width': 'initial','width': 100}
     select=SelectMultiple(
-        options=countries,
-        value=['US'],
+        options=states,
+        value=['NY'],
         style=style,
         disabled=False
     )
-    select=HBox([Label('Select a country (or multiple countries):'), select])
+    select=HBox([Label('Select a state (or multiple states):'), select])
     display(select)
-    return select,countries
+    return select,states
 
-def compute_data_props(countries,select):
-    country=[countries[k] for k in select.children[1].index]
+def compute_data_props(states,select):
+    state=[states[k] for k in select.children[1].index]
     df_dict={}
     maxval=0
-    for c in country:
+    for c in state:
         if c=='All':
-            df_dict[c]=df.sum().drop(['Lat','Long'])
+            df_dict[c]=df.sum().drop(['Lat','Long','Country/Region','Province/State'])
         else:
             try:
-                df_dict[c]=df[df['Country/Region']==c].sum().drop(['Country/Region','Lat','Long','Province/State'])
+                df_dict[c]=df[df['Province/State']==c].sum().drop(['Country/Region','Lat','Long','Province/State'])
             except:
-                df_dict[c]=df[df['Country/Region']==c].sum().drop(['Lat','Long'])
-        print(df.columns)
+                df_dict[c]=df[df['Province/State']==c].sum().drop(['Lat','Long'])
+                raise ValueError('Something went wrong!')
         if df_dict[c].max()>maxval:
             maxval=df_dict[c].max()
     last_month,last_day,x=df.columns[-1].split('/')
     last_month=int(last_month)
     last_day=int(last_day)
-    return last_month,last_day,maxval,country,df_dict
+    return last_month,last_day,maxval,state,df_dict
 def make_interactive_plot(def_plotlog=False,
-                          start_month_plot=1,start_day_plot=22,
+                          start_month_plot=3,start_day_plot=4,
                           end_month_plot=3,end_day_plot=24,
-                          def_start_month_fit=3,def_start_day_fit=1, 
+                          def_start_month_fit=3,def_start_day_fit=4, 
                           def_end_month_fit=3,def_end_day_fit=24,
-                          def_month_pred=3,def_day_pred=24,maxval=70000,country='US',df_dict={}):
+                          def_month_pred=3,def_day_pred=24,maxval=70000,country='NY',df_dict={}):
     
     style = {'description_width': 'initial'}
     xrange=FloatRangeSlider(value=[-0.1,1.1],min=-0.2,max=1.5,step=0.01,description='x range',readout=False)
