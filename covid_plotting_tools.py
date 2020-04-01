@@ -52,7 +52,7 @@ def compute_data_props(countries,select):
                 df_dict[c]=df[df['Country/Region']==c].sum().drop(['Country/Region','Lat','Long','Province/State'])
             except:
                 df_dict[c]=df[df['Country/Region']==c].sum().drop(['Lat','Long'])
-        print(df.columns)
+        #print(df.columns)
         if df_dict[c].max()>maxval:
             maxval=df_dict[c].max()
     last_month,last_day,x=df.columns[-1].split('/')
