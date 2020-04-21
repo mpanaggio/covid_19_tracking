@@ -6,3 +6,6 @@ Data by country:
 
 Data by state:
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mpanaggio/covid_19_tracking/master?filepath=plots_by_state_final.ipynb)
+
+Exploratory analysis:
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mpanaggio/covid_19_tracking/master?filepath=data_exploration.ipynb)
