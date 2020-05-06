@@ -52,13 +52,14 @@ for state in states:
         df_aligned=pd.concat([df_aligned,align_dates(df[df.state==state])],axis=0)
 df_aligned.reset_index(inplace=True)
 
-def plot_vs_events(state,col,aligned=False,logy=False,logx=False,events=False,ylabel=''):
+def plot_vs_events(state,col,aligned=False,logy=False,logx=False,events=False,ylabel='',mvavg=1):
     if aligned:
         mydf=df_aligned[df.state==state]
     else:
         mydf=df[df.state==state]
     mydf=mydf.reset_index(drop=True)
-    plt.plot(mydf.date,mydf[col],label=col)
+
+    plt.plot(mydf.date[mvavg-1:],moving_average(mydf[col],n=mvavg),label=col)
     if logx:
         plt.xscale('log')
     if logy:
@@ -82,16 +83,16 @@ def plot_vs_events(state,col,aligned=False,logy=False,logx=False,events=False,yl
     if len(ylabel)>0:
         plt.ylabel(ylabel)
         
-def plot_mobility(state,aligned):
+def plot_mobility(state,aligned,mvavg=1):
     plt.figure(figsize=(12,6))
     plt.title('Change in mobility for {}'.format(state))
-    plot_vs_events(state,col='retail and recreation',aligned=aligned)
-    plot_vs_events(state,col='grocery and pharmacy',aligned=aligned)
-    #plot_vs_events(state,col='parks',aligned=True)
-    plot_vs_events(state,col='transit',aligned=aligned)
-    plot_vs_events(state,col='workplaces',aligned=aligned)
-    plot_vs_events(state,col='residential',aligned=aligned,logy=False,
-                   events=True,ylabel='percent chang\n relative to baseline')
+    plot_vs_events(state,col='retail and recreation',aligned=aligned,mvavg=mvavg)
+    plot_vs_events(state,col='grocery and pharmacy',aligned=aligned,mvavg=mvavg)
+    #plot_vs_events(state,col='parks',aligned=True,mvavg=mvavg)
+    plot_vs_events(state,col='transit',aligned=aligned,mvavg=mvavg)
+    plot_vs_events(state,col='workplaces',aligned=aligned,mvavg=mvavg)
+    plot_vs_events(state,col='residential',aligned=aligned,mvavg=mvavg,logy=False,
+                   events=True,ylabel='percent change\n relative to baseline')
     plt.legend(bbox_to_anchor=(1.04,1), loc='upper left', ncol=1)
     plt.show()
     
